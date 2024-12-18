@@ -12,6 +12,8 @@ using RT.Servers;
 using RT.TagSoup;
 using RT.Util;
 using RT.Util.ExtensionMethods;
+using Newtonsoft.Json.Linq;
+
 
 namespace KtaneWeb
 {
@@ -178,64 +180,7 @@ namespace KtaneWeb
 
                 static string unifyString(string str) => Regex.Replace(str.Normalize(NormalizationForm.FormD), @"[\u0300-\u036f]", "").Replace("grey", "gray").Replace("colour", "color");
 
-                // Filter
-                var matchingModules = _moduleInfoCache.Modules.Where(m =>
-                {
-                    // TEMPORARY: Currently there is no easy way to find the correct filename for the manual of a translated module, so we’re excluding those from the merged PDF entirely.
-                    // A desirable fix would be to discover the correct PDF filename for the translated manual and include it.
-                    if (m.TranslationOf != null)
-                        return false;
-
-                    if (profileVetoList != null && !(profileVetoList.Contains(m.ModuleID) ? filterVetoedByProfile : filterEnabledByProfile))
-                        return false;
-
-                    foreach (var filter in TranslationInfo.Default.Filters1)
-                        if (!filter.Matches(m, json["filter"].Safe[filter.PropName].GetDictSafe()))
-                            return false;
-                    foreach (var filter in TranslationInfo.Default.Filters2)
-                        if (!filter.Matches(m, json["filter"].Safe[filter.PropName].GetDictSafe()))
-                            return false;
-
-                    if (keywords == null)
-                        return true;
-
-                    var searchWhat = searchBySteamID ? (m.SteamID ?? "") : "";
-                    if (searchByModuleID)
-                        searchWhat += " " + m.ModuleID.ToLowerInvariant();
-                    if (searchOptions.Contains("names"))
-                        searchWhat += " " + m.Name.ToLowerInvariant() + " " + m.SortKey.ToLowerInvariant();
-                    if (searchOptions.Contains("authors") && (m.Author != null || m.Contributors != null))
-                        if (displayAllContributors)
-                            searchWhat += " " + (m.Author ?? m.Contributors.ToAllAuthorString()).ToLowerInvariant();
-                        else
-                            searchWhat += " " + (m.Author ?? m.Contributors.ToAuthorString()).ToLowerInvariant();
-
-                    if (searchOptions.Contains("descriptions"))
-                    {
-                        var descr = m.Descriptions.FirstOrDefault(d => d.Language == langName);
-                        if (descr != null && displayDesc)
-                            searchWhat += ' ' + descr?.Description.ToLowerInvariant();
-                        if (descr != null && displayTags && !string.IsNullOrWhiteSpace(descr.Tags))
-                            searchWhat += ' ' + descr?.Tags.ToLowerInvariant();
-                    }
-
-                    if (searchBySymbol && m.Symbol != null)
-                        searchWhat += " " + m.Symbol.ToLowerInvariant();
-
-                    return keywords.All(unifyString(searchWhat).ContainsIgnoreCase);
-                });
-
-                // Sort
-                switch (json["sort"].GetString())
-                {
-                    case "name": matchingModules = matchingModules.OrderBy(m => m.SortKey); break;
-                    case "defdiff": matchingModules = matchingModules.OrderBy(m => m.DefuserDifficulty); break;
-                    case "expdiff": matchingModules = matchingModules.OrderBy(m => m.ExpertDifficulty); break;
-                    case "twitchscore": matchingModules = matchingModules.OrderBy(m => m.TwitchPlaysScore ?? 0); break;
-                    case "timemodescore": matchingModules = matchingModules.OrderBy(m => m.TimeMode?.Score ?? 0); break;
-                    case "published": matchingModules = matchingModules.OrderByDescending(m => m.Published); break;
-                }
-
+                var matchingModules = GetFilteredModules(req);
                 var pdfFiles = new List<string>();
                 var generated = 0;
                 var notGenerated = new List<string>();
@@ -343,6 +288,131 @@ namespace KtaneWeb
                     exc = exc.InnerException;
                 }
                 return HttpResponse.PlainText(sb.ToString(), HttpStatusCode._500_InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Returns a json 
+        /// </summary>
+        /// <param name="req"></param>
+        private HttpResponse filterProfiles(HttpRequest req)
+        {
+            var matchingModules = GetFilteredModules(req);
+            var disabledListIenumerable = _moduleInfoCache.Modules.Except(matchingModules);
+
+            var enabledList = new JArray(matchingModules.Select(m => m.ModuleID).ToArray());
+            var disabledList = new JArray(disabledListIenumerable.Select(m => m.ModuleID).ToArray());
+
+
+            var obj = new JObject();
+            obj.Add("DisabledList", disabledList);
+            obj.Add("EnabledList", enabledList);
+            obj.Add("Operation", 0);
+
+            string json = obj.ToString();
+            Console.WriteLine(json);
+
+            return HttpResponse.PlainText(json);
+        }
+
+        /// <summary>
+        /// Gets all the modules that match the user's filters
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        private IEnumerable<KtaneModuleInfo> GetFilteredModules(HttpRequest req)
+        {
+            var language = req.Headers.Cookie.Get("lang", null)?.Value ?? "en";
+            var langName = TranslationInfo.LanguageCodeToName.Get(language, "English");
+
+            try
+            {
+                //Note: I'm unsure if this if check needed in order to get the modules, I copied this from "mergePdfs"
+
+                //if (req.Method != HttpMethod.Post)
+                //    return HttpResponse.Redirect(req.Url.WithPathParent().WithPath(""));
+
+                var messages = new StringBuilder();
+                var json = JsonValue.Parse(req.Post["json"].Value);
+                json.AppendIndented(messages);
+                var keywords = json["search"].GetString().Length == 0 ? null : json["search"].GetString().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var searchOptions = json["searchOptions"].GetList().Select(j => j.GetString()).ToArray();
+                var filterEnabledByProfile = json["filterEnabledByProfile"].GetBool();
+                var filterVetoedByProfile = json["filterVetoedByProfile"].GetBool();
+                var profileVetoList = (filterEnabledByProfile == filterVetoedByProfile) ? null : json["profileVetoList"]?.GetList().Select(j => j.GetString()).ToArray();
+                var searchBySymbol = json["searchBySymbol"].GetBoolSafe() ?? false;
+                var searchBySteamID = json["searchBySteamID"].GetBoolSafe() ?? false;
+                var searchByModuleID = json["searchByModuleID"].GetBoolSafe() ?? false;
+                var displayAllContributors = json["dispAllContr"].GetBoolSafe() ?? false;
+                var displayDesc = json["displayDesc"].GetBoolSafe() ?? false;
+                var displayTags = json["displayTags"].GetBoolSafe() ?? false;
+                var restrictedManuals = json["restrictedManuals"].GetList().Select(j => j.GetString()).ToArray();
+
+                static string unifyString(string str) => Regex.Replace(str.Normalize(NormalizationForm.FormD), @"[\u0300-\u036f]", "").Replace("grey", "gray").Replace("colour", "color");
+
+                // Filter
+                var matchingModules = _moduleInfoCache.Modules.Where(m =>
+                {
+                    // TEMPORARY: Currently there is no easy way to find the correct filename for the manual of a translated module, so we’re excluding those from the merged PDF entirely.
+                    // A desirable fix would be to discover the correct PDF filename for the translated manual and include it.
+                    if (m.TranslationOf != null)
+                        return false;
+
+                    if (profileVetoList != null && !(profileVetoList.Contains(m.ModuleID) ? filterVetoedByProfile : filterEnabledByProfile))
+                        return false;
+
+                    foreach (var filter in TranslationInfo.Default.Filters1)
+                        if (!filter.Matches(m, json["filter"].Safe[filter.PropName].GetDictSafe()))
+                            return false;
+                    foreach (var filter in TranslationInfo.Default.Filters2)
+                        if (!filter.Matches(m, json["filter"].Safe[filter.PropName].GetDictSafe()))
+                            return false;
+
+                    if (keywords == null)
+                        return true;
+
+                    var searchWhat = searchBySteamID ? (m.SteamID ?? "") : "";
+                    if (searchByModuleID)
+                        searchWhat += " " + m.ModuleID.ToLowerInvariant();
+                    if (searchOptions.Contains("names"))
+                        searchWhat += " " + m.Name.ToLowerInvariant() + " " + m.SortKey.ToLowerInvariant();
+                    if (searchOptions.Contains("authors") && (m.Author != null || m.Contributors != null))
+                        if (displayAllContributors)
+                            searchWhat += " " + (m.Author ?? m.Contributors.ToAllAuthorString()).ToLowerInvariant();
+                        else
+                            searchWhat += " " + (m.Author ?? m.Contributors.ToAuthorString()).ToLowerInvariant();
+
+                    if (searchOptions.Contains("descriptions"))
+                    {
+                        var descr = m.Descriptions.FirstOrDefault(d => d.Language == langName);
+                        if (descr != null && displayDesc)
+                            searchWhat += ' ' + descr?.Description.ToLowerInvariant();
+                        if (descr != null && displayTags && !string.IsNullOrWhiteSpace(descr.Tags))
+                            searchWhat += ' ' + descr?.Tags.ToLowerInvariant();
+                    }
+
+                    if (searchBySymbol && m.Symbol != null)
+                        searchWhat += " " + m.Symbol.ToLowerInvariant();
+
+                    return keywords.All(unifyString(searchWhat).ContainsIgnoreCase);
+                });
+
+                // Sort
+                switch (json["sort"].GetString())
+                {
+                    case "name": matchingModules = matchingModules.OrderBy(m => m.SortKey); break;
+                    case "defdiff": matchingModules = matchingModules.OrderBy(m => m.DefuserDifficulty); break;
+                    case "expdiff": matchingModules = matchingModules.OrderBy(m => m.ExpertDifficulty); break;
+                    case "twitchscore": matchingModules = matchingModules.OrderBy(m => m.TwitchPlaysScore ?? 0); break;
+                    case "timemodescore": matchingModules = matchingModules.OrderBy(m => m.TimeMode?.Score ?? 0); break;
+                    case "published": matchingModules = matchingModules.OrderByDescending(m => m.Published); break;
+                }
+
+                return matchingModules;
+            }
+            catch
+            {
+                return new List<KtaneModuleInfo>();
             }
         }
     }

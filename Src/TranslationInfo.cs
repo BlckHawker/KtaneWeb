@@ -102,6 +102,7 @@ namespace KtaneWeb
         public string modeEditorAnchor = "Mode Setting Editor";
         public string newModuleAnchor = "Create new module";
         public string downloadPDF = "Download merged PDF for current filter";
+        public string downdloadProfile = "Download profile for current filter";
         public string ignoredTableAnchor = "Table of ignored modules";
         public string ignoreTableURL = "More/Ignore%20Table.html";
         public string tfcAnchor = "Text Field Calculator";

@@ -186,6 +186,10 @@ namespace KtaneWeb
                                 new FORM { action = "merge-pdf", method = method.post }._(
                                 new INPUT { type = itype.hidden, name = "json", id = "generate-pdf-json" },
                                 new BUTTON { id = "generate-pdf", type = btype.submit }._(translation.downloadPDF))),
+                            new DIV { class_ = "profile-merge" }._(
+                                new FORM { action = "profile-filter-generator", method = method.post }._(
+                                new INPUT { type = itype.hidden, name = "json", id = "generate-profile-json" },
+                                new BUTTON { id = "generate-profile", type = btype.submit }._(translation.downdloadProfile))),
                             new UL { class_ = "below-icons" }._(
                                 new LI(new A { href = translation.ignoreTableURL }._(translation.ignoredTableAnchor)),
                                 new LI(new A { href = "https://files.timwi.de/Tools/Calculator.html" }._(translation.tfcAnchor)))),

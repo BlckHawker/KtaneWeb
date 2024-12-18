@@ -15,6 +15,7 @@
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
     <PackageReference Include="ICSharpCode.SharpZipLib" Version="0.86.0.518" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PdfSharp" Version="1.50.5147.0" />
     <PackageReference Include="PropellerApi" Version="1.0.31" />
     <PackageReference Include="RT.CommandLine" Version="2.1.161" />
