@@ -265,6 +265,7 @@ namespace KtaneWeb
         public string themeLight = "Light";
         public string themeDark = "Dark";
         public string linkOption = "Make links go to";
+        public string openLinksNewTab = "Open links in new tab";
         public string languagesOption = "Languages";
         public string languagesToggle = "Toggle All Languages";
         public string listTutorialVideos = "Tutorial Videos";

@@ -350,7 +350,9 @@ namespace KtaneWeb
                                 new H4(translation.linkOption),
                                 translation.Selectables.Select(sel => new DIV(
                                     new INPUT { type = itype.radio, class_ = "set-selectable", name = "selectable", id = $"selectable-{sel.PropName}" }.Data("selectable", sel.PropName), " ",
-                                    new LABEL { class_ = "set-selectable", id = $"selectable-label-{sel.PropName}", for_ = $"selectable-{sel.PropName}", accesskey = sel.Accel?.ToString().ToLowerInvariant() }._(sel.HumanReadable.Accel(sel.Accel))))),
+                                    new LABEL { class_ = "set-selectable", id = $"selectable-label-{sel.PropName}", for_ = $"selectable-{sel.PropName}", accesskey = sel.Accel?.ToString().ToLowerInvariant() }._(sel.HumanReadable.Accel(sel.Accel)))),
+                                new INPUT { id = "new-tab-check", class_ = "new-tab", type = itype.checkbox }, " ",
+                                new LABEL { for_ = "new-tab-check" }._(translation.openLinksNewTab)),
                             new DIV { class_ = "option-group" }._(new H4(translation.languagesOption), new DIV { id = "languages-option" }),
                             new BUTTON { class_ = "toggle-all-languages" }._(translation.languagesToggle)),
 
