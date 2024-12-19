@@ -614,7 +614,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
                             }
 
                             let icon = el("img", "mod-icon", { src: `Icons/${mod.X === 0 && mod.Y === 0 ? 'blank' : encodeURIComponent(mod.FileName ?? mod.Name)}.png` });
-                            let modlink = el("a", "modlink", { href: mod.SelectableLinkUrl }, icon, el("span", "mod-name", mod.localName.replace(/'/g, "’")));
+                            let modlink = el("a", "modlink", { href: mod.SelectableLinkUrl, target: "_blank" }, icon,  el("span", "mod-name", mod.localName.replace(/'/g, "’")));
                             setCompatibilityTooltip(modlink, mod);
                             mod.ViewData.List.SelectableLink = modlink;
                             let td1 = el("td", "infos-1", el("div", "modlink-wrap", modlink, mod.localName === mod.Name ? null : el("div", "inf-origname", mod.Name.replace(/'/g, "’"))));
@@ -1085,6 +1085,9 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
     // Sets the module links to the current selectable and the manual icon link to the preferred manuals
     function setLinksAndPreferredManuals()
     {
+        //check if the link should open in a new tab
+        let newTab = $('#new-tab-check').prop('checked');
+
         let seed = +$('#rule-seed-input').val();
         let seedHash = (seed === 1 ? '' : '#' + seed);
         for (let mod of modules)
@@ -1113,6 +1116,8 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
 
                 for (let fnc of mod.FncsSetManualLink)
                     fnc(manual === null ? null : manual.Url + seedHash);
+
+                console.log(mod);
             }
             for (let fnc of mod.FncsSetSelectable)
                 fnc(selectable === 'manual' ? (manual === null ? null : manual.Url + seedHash) : (initSelectables.filter(sl => sl.PropName === selectable).map(sl => sl.UrlFunction(mod))[0] || null));
@@ -1175,7 +1180,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
                     if (['manual', 'video'].includes(sel.PropName) || !sel.ShowIconFunction(mod, mod.Manuals))
                         continue;
                     let iconDiv = el('div', 'icon',
-                        el('a', 'icon-link', { href: sel.UrlFunction(mod, mod.Manuals) },
+                        el('a', 'icon-link', { href: sel.UrlFunction(mod, mod.Manuals), target: "_blank" },
                             el('img', 'icon-img', { src: sel.IconFunction(mod, mod.Manuals) }),
                             el('span', 'icon-label', sel.HumanReadableFunction ? sel.HumanReadableFunction(mod, mod.Manuals) : sel.HumanReadable)));
                     iconsDiv.appendChild(iconDiv);
@@ -1367,7 +1372,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
 
             tutorialMenu.appendChild(
                 el('a', null,
-                    { href: tutorialUrl },
+                    { href: tutorialUrl, target:"_blank" },
                     el('div', null, tutorialLang),
                     el('div', null, tutorialName),
                     el('div', null, el('img', 'icon', { title: "Tutorial video", alt: "Tutorial video", src: "HTML/img/video.png" }))));
@@ -1552,7 +1557,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
 
     // This also calls updateFilter()
     setSelectable(selectable);
-
+    $('input.new-tab').click(function () { setLinksAndPreferredManuals() })
     $('input.set-selectable').click(function() { setSelectable($(this).data('selectable')); });
     $('input.filter').click(function() { updateFilter(); });
     $("input.results-mode").click(function() { setResultsMode(this.value, resultsLimit); });
