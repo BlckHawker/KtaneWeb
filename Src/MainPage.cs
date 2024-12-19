@@ -178,17 +178,17 @@ namespace KtaneWeb
                             new DIV { class_ = "close" },
                             new DIV { class_ = "icons" }._(
                                 new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Logfile%20Analyzer.html", target= "_blank", accesskey = "a" }._(new IMG { class_ = "icon-img", src = "HTML/img/logfile-analyzer.png" }, new SPAN { class_ = "icon-label" }._(translation.lfaAnchor.Accel('A')))),
-                                new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Profile%20Editor.html", accesskey = "p" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.profileEditorAnchor))),
+                                new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Profile%20Editor.html", target = "_blank", accesskey = "p" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.profileEditorAnchor))),
                                 new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "profile/zip" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.downloadProfileAnchor.Accel('p')))),
-                                new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Mode%20Settings%20Editor.html" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.modeEditorAnchor))),
+                                new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Mode%20Settings%20Editor.html", target = "_blank" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.modeEditorAnchor))),
                                 new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "#", id = "module-json-new" }._(new IMG { class_ = "icon-img", src = "HTML/img/edit-icon.png" }, new SPAN { class_ = "icon-label" }._(translation.newModuleAnchor)))),
                             new DIV { class_ = "pdf-merge" }._(
                                 new FORM { action = "merge-pdf", method = method.post }._(
                                 new INPUT { type = itype.hidden, name = "json", id = "generate-pdf-json" },
                                 new BUTTON { id = "generate-pdf", type = btype.submit }._(translation.downloadPDF))),
                             new UL { class_ = "below-icons" }._(
-                                new LI(new A { href = translation.ignoreTableURL }._(translation.ignoredTableAnchor)),
-                                new LI(new A { href = "https://files.timwi.de/Tools/Calculator.html" }._(translation.tfcAnchor)))),
+                                new LI(new A { href = translation.ignoreTableURL, target="_blank" }._(translation.ignoredTableAnchor)),
+                                new LI(new A { href = "https://files.timwi.de/Tools/Calculator.html", target = "_blank" }._(translation.tfcAnchor)))),
 
                         // VIEW (icon popup)
                         new DIV { id = "view", class_ = "popup disappear stay" }._(
