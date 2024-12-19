@@ -605,7 +605,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
                                     }
                                     else
                                     {
-                                        let lnkA = el("a", sel.CssClass, { href: sel.UrlFunction(mod, mod.Manuals) }, iconImg);
+                                        let lnkA = el("a", sel.CssClass, { href: sel.UrlFunction(mod, mod.Manuals), target: "_blank" }, iconImg);
                                         td.appendChild(lnkA);
                                         if (sel.PropName === 'manual')
                                             mod.FncsSetManualLink.push(url => { lnkA.href = url; });
@@ -1120,7 +1120,9 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
                 console.log(mod);
             }
             for (let fnc of mod.FncsSetSelectable)
+            {
                 fnc(selectable === 'manual' ? (manual === null ? null : manual.Url + seedHash) : (initSelectables.filter(sl => sl.PropName === selectable).map(sl => sl.UrlFunction(mod))[0] || null));
+            }
         }
         lStorage.setItem('preferredManuals', JSON.stringify(preferredManuals));
     }
