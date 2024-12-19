@@ -777,7 +777,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
                 {
                     let mod = modules[i];
                     let manualSelector = el('a', 'manual-selector', { href: '#' });
-                    let img, a = el('a', `module ${mod.ExpertDifficulty} compatibility-${mod.Compatibility}`,
+                    let img, a = el('a', `module ${mod.ExpertDifficulty} compatibility-${mod.Compatibility}`, { target: '_blank' },
                         el('div', `symbol ${mod.DefuserDifficulty}`, el('span', 'inner', mod.Symbol || '??')),
                         el('div', 'mod-icon', img = el("img", "mod-icon", { src: `Icons/blank.png` })),
                         el('div', 'name', el('div', 'inner', mod.localName)),
