@@ -177,7 +177,7 @@ namespace KtaneWeb
                         new DIV { id = "tools", class_ = "popup disappear stay" }._(
                             new DIV { class_ = "close" },
                             new DIV { class_ = "icons" }._(
-                                new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Logfile%20Analyzer.html", accesskey = "a" }._(new IMG { class_ = "icon-img", src = "HTML/img/logfile-analyzer.png" }, new SPAN { class_ = "icon-label" }._(translation.lfaAnchor.Accel('A')))),
+                                new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Logfile%20Analyzer.html", target= "_blank", accesskey = "a" }._(new IMG { class_ = "icon-img", src = "HTML/img/logfile-analyzer.png" }, new SPAN { class_ = "icon-label" }._(translation.lfaAnchor.Accel('A')))),
                                 new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Profile%20Editor.html", accesskey = "p" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.profileEditorAnchor))),
                                 new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "profile/zip" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.downloadProfileAnchor.Accel('p')))),
                                 new DIV { class_ = "icon" }._(new A { class_ = "icon-link", href = "More/Mode%20Settings%20Editor.html" }._(new IMG { class_ = "icon-img", src = "HTML/img/profile-editor.png" }, new SPAN { class_ = "icon-label" }._(translation.modeEditorAnchor))),
@@ -201,11 +201,11 @@ namespace KtaneWeb
                         new DIV { id = "more", class_ = "popup disappear stay" }._(
                             new DIV { class_ = "close" },
                             new UL { class_ = "below-icons first" }._(
-                                new LI(new A { href = "puzzles", class_ = "important" }._(translation.puzzleAnchor)),
-                                new LI(new A { href = translation.quizURL, class_ = "important" }._(translation.quizAnchor)),
-                                new LI(new A { href = "More/Experting%20Template.png" }._(translation.expertTemplateAnchor), new DIV { class_ = "link-extra" }._(translation.expertTemplateDesc)),
+                                new LI(new A { href = "puzzles", target="_blank", class_ = "important" }._(translation.puzzleAnchor)),
+                                new LI(new A { href = translation.quizURL, target = "_blank", class_ = "important" }._(translation.quizAnchor)),
+                                new LI(new A { href = "More/Experting%20Template.png", target="_blank" }._(translation.expertTemplateAnchor), new DIV { class_ = "link-extra" }._(translation.expertTemplateDesc)),
                                 new LI(new A { href = "More/Template%20Manual.zip" }._(translation.templateManualAnchor), new DIV { class_ = "link-extra" }._(translation.templateManualDesc)),
-                                new LI(new A { href = "More/DeMiLMissionViewer/index.html" }._(translation.demilAnchor), new DIV { class_ = "link-extra" }._(translation.demilDesc))),
+                                new LI(new A { href = "More/DeMiLMissionViewer/index.html", target = "_blank" }._(translation.demilAnchor), new DIV { class_ = "link-extra" }._(translation.demilDesc))),
                             new DIV { class_ = "highlighting-controls" }._(
                                 new H3(translation.controlHeader),
                                 new TABLE { class_ = "highlighting-controls" }._(
