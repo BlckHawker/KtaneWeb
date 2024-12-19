@@ -504,7 +504,7 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
                             if (services[correctedService] === undefined)
                                 contactItem.textContent = `${service}: ${username}`;
                             else
-                                contactItem.appendChild(el('a', null, correctedService, { href: "https://" + services[correctedService].replace("{}", username) }));
+                                contactItem.appendChild(el('a', null, correctedService, { href: "https://" + services[correctedService].replace("{}", username), target: "_blank" }));
 
                             sublist.appendChild(contactItem);
                         }
@@ -1116,14 +1116,13 @@ function initializePage(modules, initIcons, initDocDirs, initFilters, initSelect
 
                 for (let fnc of mod.FncsSetManualLink)
                     fnc(manual === null ? null : manual.Url + seedHash);
+            }
 
-                console.log(mod);
-            }
             for (let fnc of mod.FncsSetSelectable)
-            {
                 fnc(selectable === 'manual' ? (manual === null ? null : manual.Url + seedHash) : (initSelectables.filter(sl => sl.PropName === selectable).map(sl => sl.UrlFunction(mod))[0] || null));
-            }
         }
+
+        console.log(modules[0]);
         lStorage.setItem('preferredManuals', JSON.stringify(preferredManuals));
     }
 
